@@ -3,11 +3,13 @@ window.PlanPreview = {
         window.Store.setGenerating(true, null);
         try {
             const aiData = await window.AIService.generatePlan(plan);
+            // Success: store the plan and clear loading state
             window.Store.updatePlanAI(plan.id, aiData);
+            window.Store.setGenerating(false, null);
         } catch (error) {
+            // Error: show the real error message — do NOT call setGenerating again after this
             window.Store.setGenerating(false, error.message);
         }
-        window.Store.setGenerating(false, null);
     },
 
     async handleRefinePlan(plan, instruction) {
@@ -16,10 +18,10 @@ window.PlanPreview = {
         try {
             const aiData = await window.AIService.refinePlan(plan, plan.aiData, instruction);
             window.Store.updatePlanAI(plan.id, aiData);
+            window.Store.setGenerating(false, null);
         } catch (error) {
             window.Store.setGenerating(false, error.message);
         }
-        window.Store.setGenerating(false, null);
     },
 
     attachEvents() {
